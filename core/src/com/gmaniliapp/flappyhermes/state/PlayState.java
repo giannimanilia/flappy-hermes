@@ -31,7 +31,7 @@ public class PlayState extends State {
     protected PlayState(GameStateManager gameStateManager) {
         super(gameStateManager);
 
-        orthographicCamera.setToOrtho(false, FlappyHermes.WIDTH / 2, FlappyHermes.HEIGHT / 2);
+        orthographicCamera.setToOrtho(false, FlappyHermes.WIDTH / 2.f, FlappyHermes.HEIGHT / 2.f);
 
         background = new Texture("background.png");
 

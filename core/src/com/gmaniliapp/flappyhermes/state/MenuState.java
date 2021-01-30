@@ -13,7 +13,7 @@ public class MenuState extends State {
     public MenuState(GameStateManager gameStateManager) {
         super(gameStateManager);
 
-        orthographicCamera.setToOrtho(false, FlappyHermes.WIDTH / 2, FlappyHermes.HEIGHT / 2);
+        orthographicCamera.setToOrtho(false, FlappyHermes.WIDTH / 2.f, FlappyHermes.HEIGHT / 2.f);
 
         background = new Texture("background.png");
 
@@ -33,7 +33,7 @@ public class MenuState extends State {
 
         spriteBatch.draw(background, 0, 0);
 
-        spriteBatch.draw(startButton, orthographicCamera.position.x - startButton.getWidth() / 2,
+        spriteBatch.draw(startButton, orthographicCamera.position.x - startButton.getWidth() / 2.f,
                 orthographicCamera.position.y);
 
         spriteBatch.end();

@@ -60,31 +60,15 @@ public class Column {
         return top;
     }
 
-    public void setTop(Texture top) {
-        this.top = top;
-    }
-
     public Texture getBottom() {
         return bottom;
-    }
-
-    public void setBottom(Texture bottom) {
-        this.bottom = bottom;
     }
 
     public Vector2 getPositionTop() {
         return positionTop;
     }
 
-    public void setPositionTop(Vector2 positionTop) {
-        this.positionTop = positionTop;
-    }
-
     public Vector2 getPositionBottom() {
         return positionBottom;
-    }
-
-    public void setPositionBottom(Vector2 positionBottom) {
-        this.positionBottom = positionBottom;
     }
 }
