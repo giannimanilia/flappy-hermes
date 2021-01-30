@@ -4,25 +4,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.gmaniliapp.flappyhermes.FlappyHermes;
-import com.gmaniliapp.flappyhermes.sprite.Sandal;
 import com.gmaniliapp.flappyhermes.sprite.Column;
+import com.gmaniliapp.flappyhermes.sprite.Ground;
+import com.gmaniliapp.flappyhermes.sprite.Sandal;
 
 public class PlayState extends State {
 
     private static final int COLUMN_SPACING = 125;
     private static final int COLUMN_COUNT = 4;
-    private static final int GROUND_OFFSET = -30;
 
-    private Sandal sandal;
+    private static final int GROUND_COUNT = 2;
 
     private Texture background;
-    private Texture ground;
 
-    private Vector2 positionGround1;
-    private Vector2 positionGround2;
+    private Array<Ground> grounds;
+
+    private Sandal sandal;
 
     private Array<Column> columns;
 
@@ -34,17 +33,15 @@ public class PlayState extends State {
 
         orthographicCamera.setToOrtho(false, FlappyHermes.WIDTH / 2, FlappyHermes.HEIGHT / 2);
 
-        sandal = new Sandal(50, 320);
-
         background = new Texture("background.png");
-        ground = new Texture("ground.png");
 
-        positionGround1 =
-                new Vector2(orthographicCamera.position.x - orthographicCamera.viewportWidth / 2,
-                        GROUND_OFFSET);
-        positionGround2 =
-                new Vector2(orthographicCamera.position.x - orthographicCamera.viewportWidth / 2 +
-                        ground.getWidth(), GROUND_OFFSET);
+        grounds = new Array<>();
+        for (int i = 0; i < GROUND_COUNT; i++) {
+            grounds.add(new Ground(
+                    orthographicCamera.position.x - orthographicCamera.viewportWidth / 2, i));
+        }
+
+        sandal = new Sandal(50, 320);
 
         columns = new Array<>();
 
@@ -60,7 +57,19 @@ public class PlayState extends State {
     public void update(float deltaTime) {
         handleInput();
 
-        updateGround();
+        for (int i = 0; i < grounds.size; i++) {
+            Ground ground = grounds.get(i);
+
+            if (orthographicCamera.position.x - orthographicCamera.viewportWidth / 2 >
+                    ground.getPosition().x + ground.getTexture().getWidth()) {
+                ground.reposition(
+                        ground.getPosition().x + ground.getTexture().getWidth() * GROUND_COUNT);
+            }
+            if (ground.collides(sandal.getBounds())) {
+                hit.play();
+                gameStateManager.set(new MenuState(gameStateManager));
+            }
+        }
 
         sandal.update(deltaTime);
 
@@ -72,18 +81,15 @@ public class PlayState extends State {
             if (orthographicCamera.position.x - orthographicCamera.viewportWidth / 2 >
                     column.getPositionTop().x + column.getTop().getWidth()) {
                 column.reposition(
-                        column.getPositionTop().x + ((Column.WIDTH + COLUMN_SPACING) * COLUMN_COUNT));
+                        column.getPositionTop().x +
+                                ((Column.WIDTH + COLUMN_SPACING) * COLUMN_COUNT));
                 point.play();
             }
             if (column.collides(sandal.getBounds())) {
                 hit.play();
-                gameStateManager.set(new com.gmaniliapp.flappyhermes.state.MenuState(gameStateManager));
+                gameStateManager
+                        .set(new com.gmaniliapp.flappyhermes.state.MenuState(gameStateManager));
             }
-        }
-
-        if (sandal.getPosition().y <= ground.getHeight() + GROUND_OFFSET) {
-            hit.play();
-            gameStateManager.set(new MenuState(gameStateManager));
         }
 
         orthographicCamera.update();
@@ -104,11 +110,13 @@ public class PlayState extends State {
         for (Column column : columns) {
             spriteBatch.draw(column.getTop(), column.getPositionTop().x, column.getPositionTop().y);
             spriteBatch
-                    .draw(column.getBottom(), column.getPositionBottom().x, column.getPositionBottom().y);
+                    .draw(column.getBottom(), column.getPositionBottom().x,
+                            column.getPositionBottom().y);
         }
 
-        spriteBatch.draw(ground, positionGround1.x, positionGround1.y);
-        spriteBatch.draw(ground, positionGround2.x, positionGround2.y);
+        for (Ground ground : grounds) {
+            spriteBatch.draw(ground.getTexture(), ground.getPosition().x, ground.getPosition().y);
+        }
 
         spriteBatch.end();
     }
@@ -116,11 +124,13 @@ public class PlayState extends State {
     @Override
     public void dispose() {
         background.dispose();
+        for (Ground ground : grounds) {
+            ground.dispose();
+        }
         sandal.dispose();
         for (Column column : columns) {
             column.dispose();
         }
-        ground.dispose();
         hit.dispose();
         point.dispose();
     }
@@ -129,15 +139,6 @@ public class PlayState extends State {
     protected void handleInput() {
         if (Gdx.input.justTouched()) {
             sandal.jump();
-        }
-    }
-
-    private void updateGround() {
-        if (orthographicCamera.position.x - orthographicCamera.viewportWidth / 2 > positionGround1.x + ground.getWidth()) {
-            positionGround1.add(ground.getWidth() * 2, 0);
-        }
-        if (orthographicCamera.position.x - orthographicCamera.viewportWidth / 2 > positionGround2.x + ground.getWidth()) {
-            positionGround2.add(ground.getWidth() * 2, 0);
         }
     }
 }
