@@ -43,7 +43,7 @@ class Sandal(x: Int, y: Int) {
     }
 
     fun jump() {
-        velocity.y = 300f
+        velocity.y = 350f
         wing.play()
     }
 
